@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JULES | Créateur d'Agents IA & Web</title>
+    <!-- Importation de polices modernes et audacieuses -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600&family=Syne:wght@500;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* === VARIABLES & RESET === */
+        :root {
+            /* Palette unique : Pas de bleu, pas de noir pur */
+            --bg-deep: #16041a;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --text-main: #f4ece2;
+            --text-muted: #b8a9c0;
+            --accent-glow: #ff4a1c; /* Orange vif / Magma */
+            --accent-secondary: #c91864; /* Magenta profond */
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* === DÉFILEMENT FLUIDE === */
+        html {
+            /* Navigation de type multi-pages via JS (le smooth scroll n'est plus utile) */
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, .logo {
+            font-family: 'Syne', sans-serif;
+        }
+
+        /* === ARRIÈRE-PLAN ANIMÉ PUR CSS === */
+        .ambient-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+            background: var(--bg-deep);
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.5;
+            animation: float 20s infinite ease-in-out alternate;
+        }
+
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: var(--accent-glow);
+            top: -10%;
+            left: -10%;
+        }
+
+        .orb-2 {
+            width: 600px;
+            height: 600px;
+            background: var(--accent-secondary);
+            bottom: -20%;
+            right: -10%;
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(100px, 50px) scale(1.2); }
+            100% { transform: translate(-50px, 150px) scale(0.9); }
+        }
+
+        /* === NAVBAR === */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(22, 4, 26, 0.4);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: linear-gradient(45deg, var(--accent-glow), #ffb800);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .nav-links a:hover, .nav-links a.active-link {
+            color: var(--accent-glow);
+        }
+
+        /* === BOUTON RENDEZ-VOUS === */
+        .btn-rdv {
+            background: linear-gradient(90deg, var(--accent-secondary), var(--accent-glow));
+            color: white !important;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: bold;
+            text-decoration: none; /* Retire le soulignement visible sur ton image */
+            box-shadow: 0 10px 30px rgba(255, 74, 28, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .btn-rdv:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 74, 28, 0.5);
+        }
+
+        /* === SECTIONS COMMUNES === */
+        .page {
+            display: none;
+            min-height: 100vh;
+            padding: 120px 10%;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        
+        .page.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 60px;
+            max-width: 600px;
+        }
+
+        /* === PAGE 1 : ACCUEIL === */
+        #accueil {
+            align-items: flex-start;
+        }
+
+        .hero-title {
+            font-size: 5rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #fff, var(--text-muted));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .hero-desc {
+            font-size: 1.4rem;
+            max-width: 700px;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            border-left: 4px solid var(--accent-glow);
+            padding-left: 20px;
+        }
+
+        /* === PAGE 2 : PROBLÈMES === */
+        #problemes {
+            align-items: flex-end;
+            text-align: right;
+        }
+
+        #problemes .section-subtitle {
+            margin-left: auto;
+        }
+
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            width: 100%;
+            margin-top: 40px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            padding: 40px;
+            border-radius: 24px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.4s ease, background 0.4s ease;
+            text-align: left;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        /* === PAGE 3 : SOLUTIONS === */
+        #solutions {
+            align-items: flex-start;
+        }
+
+        .solution-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            width: 100%;
+        }
+
+        .solution-box {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+            padding: 50px;
+            border-radius: 30px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+        }
+
+        /* Effet de lueur interne pour les solutions */
+        .solution-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at top right, rgba(255, 74, 28, 0.15), transparent 60%);
+            z-index: -1;
+        }
+
+        .solution-box:nth-child(2)::before {
+            background: radial-gradient(circle at top right, rgba(201, 24, 100, 0.15), transparent 60%);
+        }
+
+        .solution-box h3 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #fff, var(--text-muted));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        ul.feature-list {
+            list-style: none;
+            margin-top: 20px;
+        }
+
+        ul.feature-list li {
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 30px;
+        }
+
+        ul.feature-list li::before {
+            content: '✦';
+            position: absolute;
+            left: 0;
+            color: var(--accent-glow);
+        }
+
+        /* === FOOTER === */
+        footer {
+            text-align: center;
+            padding: 40px;
+            border-top: 1px solid var(--glass-border);
+            background: rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        /* === RESPONSIVE DESIGN === */
+        @media (max-width: 900px) {
+            .nav-links .nav-item {
+                display: none; /* Cache uniquement les textes du menu, garde le bouton RDV */
+            }
+            .hero-title { font-size: 3.5rem; }
+            .section-title { font-size: 2.5rem; }
+            .page { padding: 100px 5%; }
+        }
+
+        @media (max-width: 600px) {
+            .hero-title { font-size: 2.5rem; }
+            .section-title { font-size: 2rem; }
+            .section-subtitle { font-size: 1rem; margin-bottom: 40px; }
+            .logo { font-size: 1.5rem; }
+            .btn-rdv { padding: 10px 20px; font-size: 0.9rem !important; }
+            .card, .solution-box { padding: 30px 20px; }
+            .solution-box h3 { font-size: 1.5rem; }
+            .grid-cards { gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Arrière-plan animé -->
+    <div class="ambient-background">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+        <a onclick="showPage('accueil', event)" class="logo" style="cursor: pointer;">JULES</a>
+        <div class="nav-links">
+            <a onclick="showPage('accueil', event)" class="nav-item active-link">L'Esprit</a>
+            <a onclick="showPage('problemes', event)" class="nav-item">Le Constat</a>
+            <a onclick="showPage('solutions', event)" class="nav-item">L'Évolution</a>
+            <a href="mailto:julesbienvenu75@gmail.com" target="_blank" class="btn-rdv">Prendre RDV</a>
+        </div>
+    </nav>
+
+    <!-- Page 1 : Présentation / Accueil -->
+    <section id="accueil" class="page active">
+        <h1 class="hero-title">Architecte<br>de l'Intelligence.</h1>
+        <p class="hero-desc">
+            Je suis freelance spécialiste en création d'Agents IA et d'expériences Web immersives. 
+            Mon objectif ? Forger des écosystèmes digitaux autonomes qui travaillent pour vous, pendant que vous vous concentrez sur l'essentiel.
+        </p>
+        <a onclick="showPage('problemes', event)" class="btn-rdv" style="background: transparent; border: 1px solid var(--accent-glow); color: var(--text-main) !important; box-shadow: none; cursor: pointer;">
+            Découvrir la vision →
+        </a>
+    </section>
+
+    <!-- Page 2 : Problèmes des entreprises -->
+    <section id="problemes" class="page">
+        <h2 class="section-title">Le monde s'accélère.<br>Votre entreprise s'essouffle.</h2>
+        <p class="section-subtitle">
+            Aujourd'hui, l'inertie numérique coûte cher. Les systèmes traditionnels ne suffisent plus face à l'exigence d'instantanéité.
+        </p>
+        
+        <div class="grid-cards">
+            <div class="card">
+                <div class="card-icon">⏳</div>
+                <h3 class="card-title">Temps Volé</h3>
+                <p>Des heures perdues chaque semaine dans des processus répétitifs, du support client basique et de la saisie manuelle qui épuisent vos équipes.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">📉</div>
+                <h3 class="card-title">Présence Invisible</h3>
+                <p>Un site web obsolète qui ne convertit plus. Dans un océan de concurrents, ne pas captiver l'attention en 3 secondes signifie perdre le client.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🤖</div>
+                <h3 class="card-title">L'Opportunité Manquée</h3>
+                <p>Ignorer l'Intelligence Artificielle aujourd'hui, c'est comme ignorer internet dans les années 2000. Vos concurrents, eux, s'automatisent déjà.</p>
+            </div>
+        </div>
+        
+        <div style="margin-top: 50px; text-align: right; width: 100%;">
+            <a onclick="showPage('solutions', event)" class="btn-rdv" style="background: transparent; border: 1px solid var(--accent-glow); color: var(--text-main) !important; box-shadow: none; cursor: pointer;">
+                Voir l'évolution →
+            </a>
+        </div>
+    </section>
+
+    <!-- Page 3 : Solutions -->
+    <section id="solutions" class="page">
+        <h2 class="section-title">La Symbiose :<br>Web & IA.</h2>
+        <p class="section-subtitle">
+            Je ne crée pas de simples sites web. Je développe des infrastructures intelligentes et vivantes, pensées pour la croissance et l'automatisation.
+        </p>
+
+        <div class="solution-wrapper">
+            <div class="solution-box">
+                <h3>Agents IA Autonomes</h3>
+                <p>Des employés virtuels infatigables qui comprennent le langage humain et agissent en conséquence.</p>
+                <ul class="feature-list">
+                    <li>Support client 24/7 hyper-personnalisé</li>
+                    <li>Qualification de leads automatique</li>
+                    <li>Intégration directe à vos outils (CRM, base de données)</li>
+                    <li>Réduction de 70% des tâches répétitives</li>
+                </ul>
+            </div>
+
+            <div class="solution-box">
+                <h3>Websites Vitrines & Avant-Gardistes</h3>
+                <p>L'écrin parfait pour héberger votre IA et fasciner vos visiteurs dès la première seconde.</p>
+                <ul class="feature-list">
+                    <li>Design UX/UI immersif (comme celui-ci)</li>
+                    <li>Performances et chargement ultra-rapides</li>
+                    <li>Architecture optimisée pour la conversion</li>
+                    <li>Développement sur-mesure et évolutif</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div style="margin-top: 80px; text-align: center; width: 100%;">
+            <p style="margin-bottom: 20px; font-size: 1.5rem; font-family: 'Syne', sans-serif;">Prêt à upgrader votre entreprise ?</p>
+            <a href="mailto:julesbienvenu75@gmail.com" target="_blank" class="btn-rdv" style="font-size: 1.2rem; padding: 18px 40px;">
+                Me Contacter <br>
+                <span style="font-size: 0.8em; font-weight: normal; opacity: 0.9;">(100% Gratuit)</span>
+            </a>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 JULES BIENVENU- Ingénierie IA & Création Web. Tous droits réservés.</p>
+    </footer>
+
+    <script>
+        // Fonction pour gérer l'affichage des pages comme un site multi-pages (SPA)
+        function showPage(pageId, event) {
+            if (event) event.preventDefault();
+
+            // 1. Cacher toutes les pages en retirant la classe 'active'
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // 2. Afficher la nouvelle page avec une animation d'apparition
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+
+            // 3. Mettre à jour la surbrillance dans le menu de navigation
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.classList.remove('active-link');
+            });
+
+            // Si le clic vient de la navigation, on l'active. Sinon on cherche le lien correspondant.
+            if (event && event.currentTarget && event.currentTarget.classList.contains('nav-item')) {
+                event.currentTarget.classList.add('active-link');
+            } else {
+                const navLink = document.querySelector(`.nav-item[onclick*="${pageId}"]`);
+                if (navLink) navLink.classList.add('active-link');
+            }
+
+            // 4. Remonter automatiquement en haut de l'écran lors d'un changement de page
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+</html>
